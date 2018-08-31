@@ -54,9 +54,12 @@ parser code {:
 /* Terminales (tokens obtenidos por el analizador lexico).
 
    Terminales que no tienen un valor son listados primero, los terminales que
-   tienen un valor como los enteros son listados en la segunda o demas lineas. */
-terminal           SEMI, OP_SUMA, OP_RESTA, OP_MULT, PARENIZQ, PARENDER;
-terminal Integer   ENTERO;
+   tienen un valor como los enteros son listados en la segunda o demas lineas.*/
+terminal           VAR,SET,ADD,LESS,CHANGEDIR,PLACE,HIGH,PUT,POS,KEEP,SKIP,KEND,
+                    FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,CALL,LPAREN,
+                     RPAREN,PUNTOCOMA,ASSIGN,IDENTIFIER,NUMBERS;
+
+//terminal Integer     ENTERO;
 
 /* No terminales usados en la seccion gramatical.
 
@@ -111,14 +114,14 @@ non terminal Integer    expr, factor, termino;
                   ;
 /* 'expr_part' se compone de una expr seguida de SEMI, o de una asign seguida de SEMI.
    asign:a esta estableciendo que a representa al objeto asociado a asign, entre {: :}
-   se coloca el sodigo en java para las acciones a tomar al cumplirse una produccion.
+   se coloca el codigo en java para las acciones a tomar al cumplirse una produccion.
 */
 
    expr_part ::= expr:e
                   {:
                     System.out.println(" = " + e);
                   :}
-                  SEMI
+                  PUNTOCOMA
                  ;
 
 /* 'expr' puede ser una expresion que inicia por numero entero op_suma expr,
@@ -127,40 +130,13 @@ non terminal Integer    expr, factor, termino;
   y se pasa al siguiente nivel de la gramatica.
 */
 
-   expr      ::=  expr:e OP_SUMA factor:f
+   expr      ::=  expr:e VAR factor:f
                   {:
                     RESULT = new Integer(e.intValue() + f.intValue());
-                  :}
-                  |
-                  expr:e OP_RESTA factor:f
-                  {:
-                    RESULT = new Integer(e.intValue() - f.intValue());
                   :}
                   |
                   factor:n
                   {:
                     RESULT = n;
-                  :}
-                  ;
-
-factor        ::=  factor:f OP_MULT termino:e
-                  {:
-                    RESULT = new Integer(f.intValue() * e.intValue());
-                  :}
-                  |
-                  termino:t
-                  {:
-                    RESULT = t;
-                  :}
-                  ;
-
-termino       ::=  PARENIZQ expr:e PARENDER
-                  {:
-                    RESULT = e;
-                  :}
-                  |
-                  ENTERO:e
-                  {:
-                    RESULT = e;
                   :}
                   ;
