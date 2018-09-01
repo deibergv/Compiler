@@ -47,19 +47,18 @@ parser code {:
     }
 :};
 
-
-
 /* ------------Declaracion de simbolos terminales y no terminales---------- */
 
 /* Terminales (tokens obtenidos por el analizador lexico).
 
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados en la segunda o demas lineas.*/
-terminal           VAR,SET,ADD,LESS,CHANGEDIR,PLACE,HIGH,PUT,POS,KEEP,SKIP,KEND,
-                    FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,CALL,LPAREN,
-                     RPAREN,PUNTOCOMA,ASSIGN,IDENTIFIER,NUMBERS;
+terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,HIGH,PUT,POS,KEEP,SKIP,KEND,
+                  FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,CALL,LPAREN,
+                   RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED;
 
-//terminal Integer     ENTERO;
+terminal String      IDENTIFIER;
+terminal Integer     NUMBER;
 
 /* No terminales usados en la seccion gramatical.
 
