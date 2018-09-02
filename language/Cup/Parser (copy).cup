@@ -1,7 +1,7 @@
 /* ---------------Seccion de declaraciones preliminares--------------------*/
 package com.language.parser;
 
-/* Importaciones  */
+/* Import the class java_cup.runtime.*  */
 import java_cup.runtime.*;
 import java.io.FileReader;
 
@@ -9,7 +9,7 @@ import java.io.FileReader;
     Agregamos el manejo de errores. */
 parser code {:
 
-    /* Reporte de error encontrado.
+    /* Reporte de error encontrado. */
     public void report_error(String message, Object info) {
         StringBuilder m = new StringBuilder("Error");
         if (info instanceof java_cup.runtime.Symbol) {
@@ -22,36 +22,15 @@ parser code {:
         }
         m.append(" : "+message);
         System.err.println(m);
-    }*/
-
-    public String resultado="";     // ni idea del uso
-    public static LinkedList<TError> TablaES = new LinkedList<TError>();
-
-    //Metodo al que se llama automaticamente ante algun error sintactico
-    public void syntax_error(Symbol s)
-    {
-        String lexema = s.value.toString();
-        int fila = s.right;
-        int columna = s.left;
-
-        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
-        System.out.println("\t\tLexema: "+lexema);
-        System.out.println("\t\tFila: "+fila);
-        System.out.println("\t\tColumna: "+columna);
-
-        TError datos = new TError(lexema,fila,columna,"Error Sintactico","Caracter no esperado");
-        TablaES.add(datos);
-
-
     }
 
     /* Cuando se encuentra un error de donde el sistema no puede
         recuperarse, se lanza un error fatal. Se despliega el mensaje
-        de error y se finaliza la ejecucion.
+        de error y se finaliza la ejecucion. */
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
         System.exit(1);
-    }*/
+    }
 
     /* Metodo main para garantizar la ejecucion del analizador
        lexico y sintactico, ademas que se pase como parametro la tabla

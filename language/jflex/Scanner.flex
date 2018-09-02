@@ -49,12 +49,13 @@ import java.io.Reader;
     Declaramos expresiones regulares que despues seran usadas en las
     reglas lexicas.
 */
+LetterMinus     = [a-z]
 Letter          = [A-Za-z]
 Digit           = [0-9]
 AlphaNumeric    = {Letter}|{Digit}
 Other_id_char   = [_]|[@]|[*]
 Number          = ({Digit})+
-Identifier      = {Letter}({AlphaNumeric}|{Other_id_char})*
+Identifier      = {LetterMinus}{1}({AlphaNumeric}|{Other_id_char}){0,9}
 LineTerminator  = \n|\r|\r\n
 InputCharacter  = [^\r\n]
 Comment         = "//" {InputCharacter}* {LineTerminator}?
