@@ -1,10 +1,19 @@
-// asdprobandoCOMENTARIO ??asdas *_@ASDA
 Var asd;
-Var dsa = 5;
-Set dsa = 6;
-ChangeDir(asd);
-Var aA@_d12Fa0;
-// Pruebas de errores:
-Var A;
-Var leatrasEr11;
-?
+Var dsa = 1;
+Set asd = 0;
+Add+zxc;
+Less-yxz;
+//ChangeDir([LEFT],[RIGHT], [BACK], [SAME]);
+Place Block;
+Place Block 5;
+High Block;
+High Block 3;
+Put Light;
+//Var x = 5;
+//Var y = 5;
+Pos (x,y);
+//Keep ... Skip ... Kend;
+//For Id = n Times ... Fend;
+//When Id = n Then ... Kend;
+PosStart (x,y);
+Call nombreProc;

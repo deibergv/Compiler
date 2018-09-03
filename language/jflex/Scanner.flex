@@ -53,9 +53,9 @@ LetterMinus     = [a-z]
 Letter          = [A-Za-z]
 Digit           = [0-9]
 AlphaNumeric    = {Letter}|{Digit}
-Other_id_char   = [_]|[@]|[*]
+Other   		= [_]|[@]|[*]
 Number          = ({Digit})+
-Identifier      = {LetterMinus}{1}({AlphaNumeric}|{Other_id_char}){0,9}
+Identifier      = {LetterMinus}{1}({AlphaNumeric}|{Other}){0,9}
 LineTerminator  = \n|\r|\r\n
 InputCharacter  = [^\r\n]
 Comment         = "//" {InputCharacter}* {LineTerminator}?
@@ -72,9 +72,17 @@ ESPACIO         = " "
 "Add"           { return newSym(sym.ADD); }
 "Less"          { return newSym(sym.LESS); }
 "ChangeDir"     { return newSym(sym.CHANGEDIR); }
+/*
+"LEFT"          { return newSym(sym.LEFT); }
+"RIGHT"         { return newSym(sym.RIGHT); }
+"BACK"          { return newSym(sym.BACK); }
+"SAME"          { return newSym(sym.SAME); }
+*/
 "Place"         { return newSym(sym.PLACE); }
+"Block"         { return newSym(sym.BLOCK); }
 "High"          { return newSym(sym.HIGH); }
 "Put"           { return newSym(sym.PUT); }
+"Light"         { return newSym(sym.LIGHT); }
 "Pos"           { return newSym(sym.POS); }
 "Keep"          { return newSym(sym.KEEP); }
 "Skip"          { return newSym(sym.SKIP); }
@@ -91,7 +99,12 @@ ESPACIO         = " "
 /* Separators */
 "("             { return newSym(sym.LPAREN); }
 ")"             { return newSym(sym.RPAREN); }
+/*
+"["             { return newSym(sym.LPARENCUAD); }
+"]"             { return newSym(sym.RPARENCUAD); }
+*/
 ";"             { return newSym(sym.PUNTOCOMA); }
+","             { return newSym(sym.COMA); }
 /* Special Symbols */
 "="             { return newSym(sym.ASSIGN); }
 "+"             { return newSym(sym.AGGREGATE); }

@@ -8,64 +8,42 @@ import java.io.FileReader;
 /* Codigo del parser, se copia integramente a la clase final.
     Agregamos el manejo de errores. */
 parser code {:
-
-    /* Reporte de error encontrado.
-    public void report_error(String message, Object info) {
-        StringBuilder m = new StringBuilder("Error");
-        if (info instanceof java_cup.runtime.Symbol) {
-            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-            if (s.left >= 0) {
-                m.append(" in line "+(s.left+1));
-                if (s.right >= 0)
-                    m.append(", column "+(s.right+1));
-            }
-        }
-        m.append(" : "+message);
-        System.err.println(m);
-    }*/
-
-    public String resultado="";     // ni idea del uso
-    public static LinkedList<TError> TablaES = new LinkedList<TError>();
-
-    //Metodo al que se llama automaticamente ante algun error sintactico
-    public void syntax_error(Symbol s)
-    {
-        String lexema = s.value.toString();
-        int fila = s.right;
-        int columna = s.left;
-
-        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
-        System.out.println("\t\tLexema: "+lexema);
-        System.out.println("\t\tFila: "+fila);
-        System.out.println("\t\tColumna: "+columna);
-
-        TError datos = new TError(lexema,fila,columna,"Error Sintactico","Caracter no esperado");
-        TablaES.add(datos);
-
-
-    }
-
-    /* Cuando se encuentra un error de donde el sistema no puede
-        recuperarse, se lanza un error fatal. Se despliega el mensaje
-        de error y se finaliza la ejecucion.
-    public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
-        System.exit(1);
-    }*/
-
-    /* Metodo main para garantizar la ejecucion del analizador
-       lexico y sintactico, ademas que se pase como parametro la tabla
-       de simbolos correspondiente. */
-    public static void main(String[] args){
-        try {
-            Parser asin = new Parser(
-                    new Scanner( new FileReader(args[0])));
-            Object result = asin.parse().value;
-            System.out.println("\n*** Resultados finales ***");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+/* Reporte de error encontrado. */
+public void report_error(String message, Object info) {
+    StringBuilder m = new StringBuilder("Error");
+    if (info instanceof java_cup.runtime.Symbol) {
+        java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+        if (s.left >= 0) {
+            m.append(" in line "+(s.left+1));
+            if (s.right >= 0)
+                m.append(", column "+(s.right+1));
         }
     }
+    m.append(" : "+message);
+    System.err.println(m);
+}
+
+/* Cuando se encuentra un error de donde el sistema no puede
+    recuperarse, se lanza un error fatal. Se despliega el mensaje
+    de error y se finaliza la ejecucion. */
+public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    System.exit(1);
+}
+
+/* Metodo main para garantizar la ejecucion del analizador
+   lexico y sintactico, ademas que se pase como parametro la tabla
+   de simbolos correspondiente. */
+public static void main(String[] args){
+    try {
+        Parser asin = new Parser(
+                new Scanner( new FileReader(args[0])));
+        Object result = asin.parse().value;
+        System.out.println("\n*** Resultados finales ***");
+    } catch (Exception ex) {
+        ex.printStackTrace();
+    }
+}
 :};
 
 /* ------------Declaracion de simbolos terminales y no terminales---------- */
@@ -73,9 +51,10 @@ parser code {:
 /* ***Terminales (tokens obtenidos por el analizador lexico).***
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados luego.*/
-terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,HIGH,PUT,POS,KEEP,SKIP,KEND,
-                  FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,CALL,LPAREN,
-                   RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED;
+terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,BLOCK,HIGH,PUT,LIGHT,POS,
+                  KEEP,SKIP,KEND,FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,
+                  CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA;
+// agregar: LEFT,RIGHT,BACK,SAME,LPARENCUAD,RPARENCUAD
 
 terminal String      IDENTIFIER;
 terminal Integer     NUMBER;
@@ -85,7 +64,8 @@ terminal Integer     NUMBER;
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
 non terminal Object     expr_list, expr_part;
-non terminal Integer    expr, factor, termino;
+non terminal String     expr;
+non terminal Integer    dato;
 
 
 /* -------------Seccion de predencia y asociacion de los terminales----------- */
@@ -100,22 +80,6 @@ non terminal Integer    expr, factor, termino;
 
 /* ------------------- Seccion de la gramatica ------------------------ */
 
-/* La gramatica de nuestro analizador.
-
-   expr_list ::=   expr_list expr_part
-                 | expr_part
-   expr_part ::=   expr SEMI
-   expr      ::=   expr PLUS factor
-                 | expr MINUS factor
-                 | factor
-   factor    ::=   factor TIMES term
-                 | factor DIVIDE term
-                 | term
-   term     ::=    LPAREN expr RPAREN
-                 | NUMBER
-                 | ID
-*/
-
 /* 'expr_list' es la raiz de la gramatica. Una 'expr_list' puede ser una 'expr_list'
    seguida de una expr_part, o puede ser una expr_part.
    Un terminal o no terminal se define <termino> ::= termino1 termino2 ... terminoN.;
@@ -126,35 +90,105 @@ non terminal Integer    expr, factor, termino;
    su procesado.
 */
 
-    expr_list ::= expr_list expr_part
-                  |
-                  expr_part
-                  ;
-/* 'expr_part' se compone de una expr seguida de SEMI, o de una asign seguida de SEMI.
-   asign:a esta estableciendo que a representa al objeto asociado a asign, entre {: :}
+expr_list   ::= expr_list expr_part
+              |
+                expr_part
+              ;
+/* 'expr_part' se compone de una "expr" seguida de PUNTOCOMA, o de una "asign" seguida de PUNTOCOMA.
+   "asign:a" esta estableciendo que "a" representa al objeto asociado a "asign", entre {: :}
    se coloca el codigo en java para las acciones a tomar al cumplirse una produccion.
 */
 
-   expr_part ::= expr:e
-                  {:
-                    System.out.println(" = " + e);
-                  :}
-                  PUNTOCOMA
-                 ;
+expr_part   ::= VAR expr:e
+               {:
+                 System.out.println("Nueva variable con nombre: " + e);
+               :}
+                PUNTOCOMA
+              | VAR expr:e ASSIGN dato:d
+               {:
+                 System.out.println("Nueva variable con nombre: " + e +
+                  " y valor: " + d);
+               :}
+                PUNTOCOMA
+              | SET expr:e ASSIGN dato:d
+               {:
+                 System.out.println("La variable a modificar tiene el nombre: "
+                  + e + " y el valor cambiará a: " + d);
+               :}
+                PUNTOCOMA
+              | ADD AGGREGATE expr:e
+               {:
+                 System.out.println("Se agregará 1 a la variable: " + e);
+               :}
+                PUNTOCOMA
+              | LESS REDUCED expr:e
+               {:
+                 System.out.println("Se quitará 1 a la variable: " + e);
+               :}
+                PUNTOCOMA
+        /*      | CHANGEDIR LPAREN LPARENCUAD expr:e RPARENCUAD RPAREN
+               {:
+                 System.out.println("Cambiando direccion a " + e);
+               :}COMA
+                PUNTOCOMA   */
+              | PLACE BLOCK
+               {:
+                 System.out.println("Se colocará un bloque en la direccion actual");
+               :}
+                PUNTOCOMA
+              | PLACE BLOCK dato:d
+               {:
+                 System.out.println("Se colocará(n) " + d +
+                 " bloques en la direccion actual");
+               :}
+                PUNTOCOMA
+              | HIGH BLOCK
+               {:
+                 System.out.println("Se colocará un bloque lvl2 en la posicion actual");
+               :}
+                PUNTOCOMA
+              | HIGH BLOCK dato:d
+               {:
+                 System.out.println("Se colocará un bloques lvl" + d +
+                 " en la posicion actual");
+               :}
+                PUNTOCOMA
+              | PUT LIGHT
+               {:
+                 System.out.println("Se colocará una luz azul en la posicion actual");
+               :}
+                PUNTOCOMA
+              | POS LPAREN expr:x COMA expr:y RPAREN
+               {:
+                 System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
+               :}
+                PUNTOCOMA
+              | POSSTART LPAREN expr:x COMA expr:y RPAREN
+               {:
+                 System.out.println("Posicion inicial: (" + x + ","+ y + ")");
+               :}
+                PUNTOCOMA
+              | CALL expr:e
+               {:
+                 System.out.println("Llamando al procedimiento: " + e);
+               :}
+                PUNTOCOMA
+                // FALTA KEEP, FOR y WHEN
+             ;
 
-/* 'expr' puede ser una expresion que inicia por numero entero op_suma expr,
+/* 'expr' puede ser una expresion que inicia por "numero entero" "op_suma" "expr",
   de esa forma se realiza una suma. Tambien puede ser un numero entero, con esto
   se devuelve el valor del entero. En RESULT se almacena el valor de las acciones,
   y se pasa al siguiente nivel de la gramatica.
 */
 
-   expr      ::=  expr:e VAR factor:f
-                  {:
-                    RESULT = new Integer(e.intValue() + f.intValue());
-                  :}
-                  |
-                  factor:n
-                  {:
-                    RESULT = n;
-                  :}
-                  ;
+expr        ::=  IDENTIFIER:n
+               {:
+                 RESULT = n;
+               :}
+              ;
+dato       ::=  NUMBER:n
+               {:
+                 RESULT = n;
+               :}
+              ;
