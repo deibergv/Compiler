@@ -53,8 +53,9 @@ public static void main(String[] args){
    tienen un valor como los enteros son listados luego.*/
 terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,BLOCK,HIGH,PUT,LIGHT,POS,
                   KEEP,SKIP,KEND,FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,
-                  CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA;
-// agregar: LEFT,RIGHT,BACK,SAME,LPARENCUAD,RPARENCUAD
+                  CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA,
+                   LEFT,RIGHT,BACK,SAME;
+// No usados: LPARENCUAD,RPARENCUAD
 
 terminal String      IDENTIFIER;
 terminal Integer     NUMBER;
@@ -126,11 +127,26 @@ expr_part   ::= VAR expr:e
                  System.out.println("Se quitará 1 a la variable: " + e);
                :}
                 PUNTOCOMA
-        /*      | CHANGEDIR LPAREN LPARENCUAD expr:e RPARENCUAD RPAREN
+              | CHANGEDIR LPAREN LEFT RPAREN
                {:
-                 System.out.println("Cambiando direccion a " + e);
-               :}COMA
-                PUNTOCOMA   */
+                 System.out.println("Cambiando direccion a LEFT");
+               :}
+                PUNTOCOMA
+              | CHANGEDIR LPAREN RIGHT RPAREN
+               {:
+                 System.out.println("Cambiando direccion a RIGHT");
+               :}
+                PUNTOCOMA
+              | CHANGEDIR LPAREN BACK RPAREN
+               {:
+                 System.out.println("Cambiando direccion a BACK");
+               :}
+                PUNTOCOMA
+              | CHANGEDIR LPAREN SAME RPAREN
+               {:
+                 System.out.println("Cambiando direccion a SAME");
+               :}
+                PUNTOCOMA
               | PLACE BLOCK
                {:
                  System.out.println("Se colocará un bloque en la direccion actual");

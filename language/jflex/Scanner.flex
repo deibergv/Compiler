@@ -72,12 +72,10 @@ ESPACIO         = " "
 "Add"           { return newSym(sym.ADD); }
 "Less"          { return newSym(sym.LESS); }
 "ChangeDir"     { return newSym(sym.CHANGEDIR); }
-/*
 "LEFT"          { return newSym(sym.LEFT); }
 "RIGHT"         { return newSym(sym.RIGHT); }
 "BACK"          { return newSym(sym.BACK); }
 "SAME"          { return newSym(sym.SAME); }
-*/
 "Place"         { return newSym(sym.PLACE); }
 "Block"         { return newSym(sym.BLOCK); }
 "High"          { return newSym(sym.HIGH); }

@@ -3,10 +3,7 @@ Var dsa = 1;
 Set asd = 0;
 Add+zxc;
 Less-yxz;
-ChangeDir(LEFT);
-ChangeDir(RIGHT);
-ChangeDir(BACK);
-ChangeDir(SAME);
+//ChangeDir([LEFT],[RIGHT], [BACK], [SAME]);
 Place Block;
 Place Block 5;
 High Block;
@@ -20,3 +17,16 @@ Pos (x,y);
 //When Id = n Then ... Kend;
 PosStart (x,y);
 Call nombreProc;
+
+
+Begin
+Expressions
+End
+
+Proc
+		probando la wea esta
+End-Proc
+
+
+
+jhgk
