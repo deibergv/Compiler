@@ -193,7 +193,7 @@ public class Main {
 				/*
 				 * Ejecutamos el analizador lexico y sintactico sobre un archivo de pruebas.
 				 */
-				String[] archivoPrueba = { "test.txt" };
+				String[] archivoPrueba = { "test1.txt" };
 				Parser.main(archivoPrueba);
 				System.out.println("Ejecutado!");
 				break;

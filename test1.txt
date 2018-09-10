@@ -2,7 +2,7 @@
 Var asd;
 Var dsa = 5;
 Set dsa = 6;
-ChangeDir(asd);
+ChangeDir(SAME);
 Var aA@_d12Fa0;
 // Pruebas de errores:
 Var A;

@@ -1,6 +1,5 @@
-Var asd;
-Var dsa = 1;
-Set asd = 0;
+
+Var asd;		Var dsa = 1;Set asd = 0;
 Add+zxc;
 Less-yxz;
 ChangeDir(LEFT);

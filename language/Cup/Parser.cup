@@ -38,7 +38,7 @@ public static void main(String[] args){
     try {
         Parser asin = new Parser(
                 new Scanner( new FileReader(args[0])));
-        Object result = asin.parse().value;
+        Object result = asin.parse().value; //parseo de datos
         System.out.println("\n*** Resultados finales ***");
     } catch (Exception ex) {
         ex.printStackTrace();
@@ -54,7 +54,7 @@ public static void main(String[] args){
 terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,BLOCK,HIGH,PUT,LIGHT,POS,
                   KEEP,SKIP,KEND,FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,
                   CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA,
-                   LEFT,RIGHT,BACK,SAME;
+                   LEFT,RIGHT,BACK,SAME,BEGIN,END,PROC,EndPROC;
 // No usados: LPARENCUAD,RPARENCUAD
 
 terminal String      IDENTIFIER;
@@ -64,7 +64,7 @@ terminal Integer     NUMBER;
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     expr_list, expr_part;
+non terminal Object     root, expr_list, expr_part;
 non terminal String     expr;
 non terminal Integer    dato;
 
@@ -154,7 +154,7 @@ expr_part   ::= VAR expr:e
                 PUNTOCOMA
               | PLACE BLOCK dato:d
                {:
-                 System.out.println("Se colocará(n) " + d +
+                 System.out.println("Se colocará " + d +
                  " bloques en la direccion actual");
                :}
                 PUNTOCOMA

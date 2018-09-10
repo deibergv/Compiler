@@ -53,7 +53,7 @@ LetterMinus     = [a-z]
 Letter          = [A-Za-z]
 Digit           = [0-9]
 AlphaNumeric    = {Letter}|{Digit}
-Other   		= [_]|[@]|[*]
+Other   		    = [_]|[@]|[*]
 Number          = ({Digit})+
 Identifier      = {LetterMinus}{1}({AlphaNumeric}|{Other}){0,9}
 LineTerminator  = \n|\r|\r\n
@@ -67,6 +67,10 @@ ESPACIO         = " "
 {Comment}       { /* ignore */ }
 {ESPACIO}       { /* ignore */ }
 {LineTerminator} { /* ignore */ }
+"Begin"         { return newSym(sym.BEGIN); }
+"End"           { return newSym(sym.END); }
+"Proc"          { return newSym(sym.PROC); }
+"End-Proc"      { return newSym(sym.EndPROC); }
 "Var"           { return newSym(sym.VAR); }
 "Set"           { return newSym(sym.SET); }
 "Add"           { return newSym(sym.ADD); }

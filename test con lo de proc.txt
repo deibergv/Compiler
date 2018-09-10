@@ -1,32 +1,32 @@
-Var asd;
-Var dsa = 1;
-Set asd = 0;
-Add+zxc;
-Less-yxz;
-//ChangeDir([LEFT],[RIGHT], [BACK], [SAME]);
-Place Block;
-Place Block 5;
-High Block;
-High Block 3;
-Put Light;
-//Var x = 5;
-//Var y = 5;
-Pos (x,y);
+		// --------------------- Identifiers ------------------
+Var asd;		// creacion de identificador
+Var dsa = 1;Var x = 7; Var y = 7;
+
+Begin		// --------------------- Begin: expressions -----------
+Set asd = 5;		// modificacion del valor de un identificador
+Add+dsa;		// aumento en 1 valor al identificador
+Less-asd;		// reduccion en 1 valor al identificador
+
+Pos (x,y);		// movimiento a una posicion(x,y) en el tablero
+ChangeDir(BACK);	// cambio en la direccion de colocacion de elementos
+Place Block;		// agregado de un bloque siguiendo la direccion (por defecto con lvl1)
+Place Block 3;		// agregado de "n" bloques (por defecto con lvl1)
+High Block;		// agregado de bloques con altura mayor a lvl2
+High Block 3;		// agregado de "n" bloques con altura mayor a lvl2
+Put Light;		// agregado de una luz en la posicion
+PosStart (asd,dsa);	// asignacion de posicion inicial del bot	
+
 //Keep ... Skip ... Kend;
-//For Id = n Times ... Fend;
+For Id = 2 Times   /////////////////////// creo que no se ocupa el "Times"
+ChangeDir(LEFT);High Block;
+Fend;
 //When Id = n Then ... Kend;
-PosStart (x,y);
-Call nombreProc;
 
+Call proc_1;		// invocacion del procedimiento llamado "proc_1"
+End		// --------------------- End -------------------------
 
-Begin
-Expressions
-End
-
-Proc
-		probando la wea esta
-End-Proc
-
-
-
-jhgk
+Proc proc_1;	// --------------------- Proc: expressions ------------------------
+ChangeDir(LEFT);
+High Block;
+Put Light;
+End-Proc	// --------------------- End-Proc --------------------
