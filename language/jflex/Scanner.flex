@@ -59,13 +59,13 @@ Identifier      = {LetterMinus}{1}({AlphaNumeric}|{Other}){0,9}
 LineTerminator  = \n|\r|\r\n
 InputCharacter  = [^\r\n]
 Comment         = "//" {InputCharacter}* {LineTerminator}?
-ESPACIO         = " "
+WhiteSpace      = " "|\t
 
 %%
 /* LEXICAL RULES: */
 /* Comments */
 {Comment}       { /* ignore */ }
-{ESPACIO}       { /* ignore */ }
+{WhiteSpace}    { /* ignore */ }
 {LineTerminator} { /* ignore */ }
 "Begin"         { return newSym(sym.BEGIN); }
 "End"           { return newSym(sym.END); }
@@ -117,5 +117,8 @@ ESPACIO         = " "
 
 /* Si el token contenido en la entrada no coincide con ninguna regla
     entonces se marca un token ilegal */
-[^]     { throw new Error("Ilegal character <"+yytext()+"> "+
-         "[Ln "+(yyline+1)+", "+"Col "+(yycolumn+1)+"]"); }
+[^]     { System.err.println("Ilegal character <"+yytext()+"> "+
+       "[Ln "+(yyline+1)+", "+"Col "+(yycolumn+1)+"]");}
+
+  /*throw new Error("Ilegal character <"+yytext()+"> "+
+"[Ln "+(yyline+1)+", "+"Col "+(yycolumn+1)+"]"); }*/

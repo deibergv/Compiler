@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<?import org.fxmisc.richtext.CodeArea?>
+
+<BorderPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.GUI.window.MainController">
+   <center>
+      <CodeArea fx:id="codeArea" BorderPane.alignment="CENTER" />
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#SearchDirectory" text="Open File" />
+              <MenuItem mnemonicParsing="false" onAction="#CloseFile" text="Close File" />
+                  <MenuItem mnemonicParsing="false" onAction="#SaveFile" text="Save File" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Run">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#RunCode" text="Send" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+    <bottom>
+      <TextArea fx:id="console" editable="false" style="-fx-control-inner-background:#000000; -fx-font-family: Consolas; -fx-highlight-fill: #00ff00; -fx-highlight-text-fill: #000000; -fx-text-fill: #00ff00; " BorderPane.alignment="CENTER" />
+      <font>
+       	 <Font name="System Bold" size="14.0" />
+   	  </font>
+   </bottom>
+</BorderPane>

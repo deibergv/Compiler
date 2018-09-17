@@ -39,7 +39,8 @@ public static void main(String[] args){
         Parser asin = new Parser(
                 new Scanner( new FileReader(args[0])));
         Object result = asin.parse().value; //parseo de datos
-        System.out.println("\n*** Resultados finales ***");
+
+        //System.out.println("\n*** Resultados finales ***\n");
     } catch (Exception ex) {
         ex.printStackTrace();
     }
@@ -51,12 +52,11 @@ public static void main(String[] args){
 /* ***Terminales (tokens obtenidos por el analizador lexico).***
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados luego.*/
-terminal         VAR,SET,ADD,LESS,CHANGEDIR,PLACE,BLOCK,HIGH,PUT,LIGHT,POS,
-                  KEEP,SKIP,KEND,FOR,ID,TIMES,FEND,WHEN,THEN,WHEND,POSSTART,
-                  CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA,
-                   LEFT,RIGHT,BACK,SAME,BEGIN,END,PROC,EndPROC;
-// No usados: LPARENCUAD,RPARENCUAD
-
+terminal      VAR,SET,ADD,LESS,CHANGEDIR,PLACE,BLOCK,HIGH,PUT,LIGHT,POS,
+               KEEP,SKIP,KEND,FOR,ID,FEND,WHEN,WHEND,POSSTART,TIMES,THEN,
+                CALL,LPAREN,RPAREN,PUNTOCOMA,ASSIGN,AGGREGATE,REDUCED,COMA,
+                 LEFT,RIGHT,BACK,SAME,BEGIN,END,PROC,EndPROC;
+// No usados: LPARENCUAD,RPARENCUAD,COMMENT
 terminal String      IDENTIFIER;
 terminal Integer     NUMBER;
 
@@ -64,10 +64,10 @@ terminal Integer     NUMBER;
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     root, expr_list, expr_part;
-non terminal String     expr;
-non terminal Integer    dato;
 
+non terminal Object     sintaxis, identifiers, expresions, process;
+non terminal String     ident;
+non terminal Integer    data;
 
 /* -------------Seccion de predencia y asociacion de los terminales----------- */
 
@@ -78,133 +78,346 @@ non terminal Integer    dato;
   /*precedence left OP_SUMA, OP_RESTA;
   precedence left OP_MULT;*/
 
-
 /* ------------------- Seccion de la gramatica ------------------------ */
 
-/* 'expr_list' es la raiz de la gramatica. Una 'expr_list' puede ser una 'expr_list'
-   seguida de una expr_part, o puede ser una expr_part.
-   Un terminal o no terminal se define <termino> ::= termino1 termino2 ... terminoN.;
-   donde termino puede ser terminal o no terminal, solo se permite un simbolo a la
-   izquierda. La | sirve para indicar que es una produccion u otra.
-   Debemos pasar de simbolos no terminales a simbolos terminales. Una gramatica que no
-   termina en simbolos terminales se dice que no reduce, y por lo tanto nunca se finaliza
-   su procesado.
-*/
-
-expr_list   ::= expr_list expr_part
-              |
-                expr_part
+sintaxis    ::= identifiers BEGIN expresions END process
+/*COMMENT identifiers BEGIN expresions END process
+              | identifiers COMMENT BEGIN expresions END process
+              | identifiers BEGIN COMMENT expresions END process
+              | identifiers BEGIN expresions COMMENT END process
+              | identifiers BEGIN expresions END COMMENT process
+              | identifiers BEGIN expresions END process COMMENT*/
               ;
-/* 'expr_part' se compone de una "expr" seguida de PUNTOCOMA, o de una "asign" seguida de PUNTOCOMA.
-   "asign:a" esta estableciendo que "a" representa al objeto asociado a "asign", entre {: :}
-   se coloca el codigo en java para las acciones a tomar al cumplirse una produccion.
-*/
 
-expr_part   ::= VAR expr:e
+identifiers ::= VAR ident:i
                {:
-                 System.out.println("Nueva variable con nombre: " + e);
+                 if (CodeValidation.Corrida1 == true) {
+			                CodeValidation.var(i);
+		             }
+                 //System.out.println("Nueva variable con nombre: " + i);
                :}
                 PUNTOCOMA
-              | VAR expr:e ASSIGN dato:d
+              | identifiers VAR ident:i
                {:
-                 System.out.println("Nueva variable con nombre: " + e +
-                  " y valor: " + d);
+                 if (CodeValidation.Corrida1 == true) {
+			               CodeValidation.var(i);
+		             }
+                 //System.out.println("Nueva variable con nombre: " + i);
                :}
                 PUNTOCOMA
-              | SET expr:e ASSIGN dato:d
+              | VAR ident:i ASSIGN data:d
                {:
-                 System.out.println("La variable a modificar tiene el nombre: "
-                  + e + " y el valor cambiará a: " + d);
+                 if (CodeValidation.Corrida1 == true) {
+			                CodeValidation.var(i,d);
+		             }
+                 //System.out.println("Nueva variable con nombre: " + i + " y valor: " + d);
                :}
                 PUNTOCOMA
-              | ADD AGGREGATE expr:e
+              | identifiers VAR ident:i ASSIGN data:d
                {:
-                 System.out.println("Se agregará 1 a la variable: " + e);
+                 if (CodeValidation.Corrida1 == true) {
+			               CodeValidation.var(i,d);
+		             }
+                 //System.out.println("Nueva variable con nombre: " + i + " y valor: " + d);
                :}
                 PUNTOCOMA
-              | LESS REDUCED expr:e
+              ;
+
+expresions  ::= SET ident:i ASSIGN data:d
                {:
-                 System.out.println("Se quitará 1 a la variable: " + e);
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.set(i, d);
+                 }
+                 //System.out.println("La variable a modificar tiene el nombre: " + i + " y el valor cambiará a: " + d);
+               :}
+                PUNTOCOMA
+              | expresions SET ident:i ASSIGN data:d
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.set(i, d);
+                 }
+                 //System.out.println("La variable a modificar tiene el nombre: " + i + " y el valor cambiará a: " + d);
+               :}
+                PUNTOCOMA
+              | ADD AGGREGATE ident:i
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.add(i);
+                 }
+                 //System.out.println("Se agregará 1 a la variable: " + i);
+               :}
+                PUNTOCOMA
+              | expresions ADD AGGREGATE ident:i
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.add(i);
+                 }
+                 //System.out.println("Se agregará 1 a la variable: " + i);
+               :}
+                PUNTOCOMA
+              | LESS REDUCED ident:i
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.less(i);
+                 }
+                 //System.out.println("Se quitará 1 a la variable: " + i);
+               :}
+                PUNTOCOMA
+              | expresions LESS REDUCED ident:i
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.less(i);
+                 }
+                 //System.out.println("Se quitará 1 a la variable: " + i);
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN LEFT RPAREN
                {:
-                 System.out.println("Cambiando direccion a LEFT");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("left");
+                 }
+                 //System.out.println("Cambiando direccion a LEFT");
+               :}
+                PUNTOCOMA
+              | expresions CHANGEDIR LPAREN LEFT RPAREN
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("left");
+                 }
+                 //System.out.println("Cambiando direccion a LEFT");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN RIGHT RPAREN
                {:
-                 System.out.println("Cambiando direccion a RIGHT");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("right");
+                 }
+                 //System.out.println("Cambiando direccion a RIGHT");
+               :}
+                PUNTOCOMA
+              | expresions CHANGEDIR LPAREN RIGHT RPAREN
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("right");
+                 }
+                 //System.out.println("Cambiando direccion a LEFT");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN BACK RPAREN
                {:
-                 System.out.println("Cambiando direccion a BACK");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("back");
+                 }
+                 //System.out.println("Cambiando direccion a BACK");
+               :}
+                PUNTOCOMA
+              | expresions CHANGEDIR LPAREN BACK RPAREN
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("back");
+                 }
+                 //System.out.println("Cambiando direccion a BACK");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN SAME RPAREN
                {:
-                 System.out.println("Cambiando direccion a SAME");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("same");
+                 }
+                 //System.out.println("Cambiando direccion a SAME");
+               :}
+                PUNTOCOMA
+              | expresions CHANGEDIR LPAREN SAME RPAREN
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.changeDir("same");
+                 }
+                 //System.out.println("Cambiando direccion a SAME");
                :}
                 PUNTOCOMA
               | PLACE BLOCK
                {:
-                 System.out.println("Se colocará un bloque en la direccion actual");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.placeBlock();
+                 }
+                 //System.out.println("Se colocará un bloque en la direccion actual");
                :}
                 PUNTOCOMA
-              | PLACE BLOCK dato:d
+              | expresions PLACE BLOCK
                {:
-                 System.out.println("Se colocará " + d +
-                 " bloques en la direccion actual");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.placeBlock();
+                 }
+                 //System.out.println("Se colocará un bloque en la direccion actual");
+               :}
+                PUNTOCOMA
+              | PLACE BLOCK data:d
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.placeBlock(d);
+                 }
+                 //System.out.println("Se colocará " + d + " bloques en la direccion actual");
+               :}
+                PUNTOCOMA
+              | expresions PLACE BLOCK data:d
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.placeBlock(d);
+                 }
+                 //System.out.println("Se colocará " + d + " bloques en la direccion actual");
                :}
                 PUNTOCOMA
               | HIGH BLOCK
                {:
-                 System.out.println("Se colocará un bloque lvl2 en la posicion actual");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.highBlock();
+                 }
+                 //System.out.println("Se colocará un bloque lvl2 en la posicion actual");
                :}
                 PUNTOCOMA
-              | HIGH BLOCK dato:d
+              | expresions HIGH BLOCK
                {:
-                 System.out.println("Se colocará un bloques lvl" + d +
-                 " en la posicion actual");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.highBlock();
+                 }
+                 //System.out.println("Se colocará un bloque lvl2 en la posicion actual");
+               :}
+                PUNTOCOMA
+              | HIGH BLOCK data:d
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.highBlock(d);
+                 }
+                 //System.out.println("Se colocará un bloques lvl" + d + " en la posicion actual");
+               :}
+                PUNTOCOMA
+              | expresions HIGH BLOCK data:d
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.highBlock(d);
+                 }
+                 //System.out.println("Se colocará un bloques lvl" + d + " en la posicion actual");
                :}
                 PUNTOCOMA
               | PUT LIGHT
                {:
-                 System.out.println("Se colocará una luz azul en la posicion actual");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.putLight();
+                 }
+                 //System.out.println("Se colocará una luz azul en la posicion actual");
                :}
                 PUNTOCOMA
-              | POS LPAREN expr:x COMA expr:y RPAREN
+              | expresions PUT LIGHT
                {:
-                 System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.putLight();
+                 }
+                 //System.out.println("Se colocará una luz azul en la posicion actual");
                :}
                 PUNTOCOMA
-              | POSSTART LPAREN expr:x COMA expr:y RPAREN
+              | POS LPAREN ident:x COMA ident:y RPAREN
                {:
-                 System.out.println("Posicion inicial: (" + x + ","+ y + ")");
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.pos(x,y);
+                 }
+                 //System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
                :}
+             | expresions POS LPAREN ident:x COMA ident:y RPAREN
+              {:
+                if (CodeValidation.Corrida1 == false) {
+                  CodeValidation.pos(x,y);
+                }
+                //System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
+              :}
                 PUNTOCOMA
-              | CALL expr:e
+              | POSSTART LPAREN ident:x COMA ident:y RPAREN
                {:
-                 System.out.println("Llamando al procedimiento: " + e);
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.posStart(x,y);
+                 }
+                 //System.out.println("Posicion inicial: (" + x + ","+ y + ")");
                :}
                 PUNTOCOMA
-                // FALTA KEEP, FOR y WHEN
-             ;
+              | expresions POSSTART LPAREN ident:x COMA ident:y RPAREN
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.posStart(x,y);
+                 }
+                 //System.out.println("Posicion inicial: (" + x + ","+ y + ")");
+               :}
+                PUNTOCOMA
+              | CALL ident:proc
+               {:
+                 if (CodeValidation.Corrida1 == false) {
+                   CodeValidation.call(proc);
+                 }
+                 //System.out.println("Llamando al procedimiento: " + i);
+               :}
+             | expresions CALL ident:proc
+              {:
+                if (CodeValidation.Corrida1 == false) {
+                  CodeValidation.call(proc);
+                }
+                //System.out.println("Llamando al procedimiento: " + i);
+              :}
+                PUNTOCOMA
+              | KEEP expresions SKIP KEND
+               {:
+                System.out.println("Bucle Keep encontrado");
+               :}
+      /*       | KEEP expresions SKIP expresions KEND
+              {:
+               System.out.println("Bucle Keep encontrado");
+              :}
+                PUNTOCOMA */
+              | FOR ID ASSIGN data:d TIMES expresions:exp {: System.out.println(exp); :}FEND
+               {://tira null el intento de sacar las expresions :c
+                System.out.println("Bucle For encontrado");
+               :}
+                PUNTOCOMA
+              | expresions FOR ID ASSIGN data:d TIMES expresions:exp
+              {:
+                  if (CodeValidation.Corrida1 == false) {
+                    System.out.println(exp);} :} FEND
+               {:
+                  if (CodeValidation.Corrida1 == false) {
+                    System.out.println("Bucle For encontrado");}
+               :}
+                PUNTOCOMA
+              | WHEN ID ASSIGN data:d THEN expresions WHEND
+               {:
+                System.out.println("Bucle When encontrado");
+               :}
+                PUNTOCOMA
+              ;
 
-/* 'expr' puede ser una expresion que inicia por "numero entero" "op_suma" "expr",
-  de esa forma se realiza una suma. Tambien puede ser un numero entero, con esto
-  se devuelve el valor del entero. En RESULT se almacena el valor de las acciones,
-  y se pasa al siguiente nivel de la gramatica.
-*/
-
-expr        ::=  IDENTIFIER:n
+process     ::= PROC ident:i expresions EndPROC
                {:
-                 RESULT = n;
+                 if (CodeValidation.Corrida1 == true) {
+			                CodeValidation.listProcesos.add(i);
+                 //      //CodeValidation.listEXPRESIONESdELpROCESO.add(expresions);
+		             }
+                //System.out.println("Proceso creado");
+               :}
+                PUNTOCOMA
+              | process PROC ident:i expresions EndPROC
+               {:
+                 if (CodeValidation.Corrida1 == true) {
+			                CodeValidation.listProcesos.add(i);
+                      // CodeValidation.listEXPRESIONESdELpROCESO.add(expresions);
+		             }
+                //System.out.println("Siguiente proceso creado");
+               :}
+                PUNTOCOMA
+              ;
+
+ident       ::= IDENTIFIER:i
+               {:
+                RESULT = i;
                :}
               ;
-dato       ::=  NUMBER:n
+data        ::= NUMBER:n
                {:
-                 RESULT = n;
+                RESULT = n;
                :}
               ;
