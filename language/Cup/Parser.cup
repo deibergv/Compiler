@@ -4,6 +4,9 @@ package com.language.parser;
 /* Importaciones  */
 import java_cup.runtime.*;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /* Codigo del parser, se copia integramente a la clase final.
     Agregamos el manejo de errores. */
@@ -125,288 +128,522 @@ identifiers ::= VAR ident:i
 
 expresions  ::= SET ident:i ASSIGN data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.set(i, d);
+                 } else if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("set");
+                   CodeValidation.listExpresiones.add(i);
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
-                 //System.out.println("La variable a modificar tiene el nombre: " + i + " y el valor cambiará a: " + d);
+                 // System.out.println("La variable a modificar tiene el nombre: " + i + " y el valor cambiará a: " + d);
                :}
                 PUNTOCOMA
               | expresions SET ident:i ASSIGN data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.set(i, d);
+                 } else if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("set");
+                   CodeValidation.listExpresiones.add(i);
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
                  //System.out.println("La variable a modificar tiene el nombre: " + i + " y el valor cambiará a: " + d);
                :}
                 PUNTOCOMA
               | ADD AGGREGATE ident:i
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.add(i);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("add");
+                   CodeValidation.listExpresiones.add(i);
                  }
                  //System.out.println("Se agregará 1 a la variable: " + i);
                :}
                 PUNTOCOMA
               | expresions ADD AGGREGATE ident:i
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.add(i);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("add");
+                   CodeValidation.listExpresiones.add(i);
                  }
                  //System.out.println("Se agregará 1 a la variable: " + i);
                :}
                 PUNTOCOMA
               | LESS REDUCED ident:i
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.less(i);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("less");
+                   CodeValidation.listExpresiones.add(i);
                  }
                  //System.out.println("Se quitará 1 a la variable: " + i);
                :}
                 PUNTOCOMA
               | expresions LESS REDUCED ident:i
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.less(i);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("less");
+                   CodeValidation.listExpresiones.add(i);
                  }
                  //System.out.println("Se quitará 1 a la variable: " + i);
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN LEFT RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("left");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("left");
                  }
                  //System.out.println("Cambiando direccion a LEFT");
                :}
                 PUNTOCOMA
               | expresions CHANGEDIR LPAREN LEFT RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("left");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("left");
                  }
                  //System.out.println("Cambiando direccion a LEFT");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN RIGHT RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("right");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("right");
                  }
                  //System.out.println("Cambiando direccion a RIGHT");
                :}
                 PUNTOCOMA
               | expresions CHANGEDIR LPAREN RIGHT RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("right");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("right");
                  }
                  //System.out.println("Cambiando direccion a LEFT");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN BACK RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("back");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("back");
                  }
                  //System.out.println("Cambiando direccion a BACK");
                :}
                 PUNTOCOMA
               | expresions CHANGEDIR LPAREN BACK RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("back");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("back");
                  }
                  //System.out.println("Cambiando direccion a BACK");
                :}
                 PUNTOCOMA
               | CHANGEDIR LPAREN SAME RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("same");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("same");
                  }
                  //System.out.println("Cambiando direccion a SAME");
                :}
                 PUNTOCOMA
               | expresions CHANGEDIR LPAREN SAME RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.changeDir("same");
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("changeDir");
+                   CodeValidation.listExpresiones.add("same");
                  }
                  //System.out.println("Cambiando direccion a SAME");
                :}
                 PUNTOCOMA
               | PLACE BLOCK
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.placeBlock();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("placeBlock");
                  }
                  //System.out.println("Se colocará un bloque en la direccion actual");
                :}
                 PUNTOCOMA
               | expresions PLACE BLOCK
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.placeBlock();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("placeBlock");
                  }
                  //System.out.println("Se colocará un bloque en la direccion actual");
                :}
                 PUNTOCOMA
               | PLACE BLOCK data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.placeBlock(d);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("placeBlockN");
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
                  //System.out.println("Se colocará " + d + " bloques en la direccion actual");
                :}
                 PUNTOCOMA
               | expresions PLACE BLOCK data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.placeBlock(d);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("placeBlockN");
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
                  //System.out.println("Se colocará " + d + " bloques en la direccion actual");
                :}
                 PUNTOCOMA
               | HIGH BLOCK
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.highBlock();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("highBlock");
                  }
                  //System.out.println("Se colocará un bloque lvl2 en la posicion actual");
                :}
                 PUNTOCOMA
               | expresions HIGH BLOCK
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.highBlock();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("highBlock");
                  }
                  //System.out.println("Se colocará un bloque lvl2 en la posicion actual");
                :}
                 PUNTOCOMA
               | HIGH BLOCK data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.highBlock(d);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("highBlockN");
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
                  //System.out.println("Se colocará un bloques lvl" + d + " en la posicion actual");
                :}
                 PUNTOCOMA
               | expresions HIGH BLOCK data:d
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.highBlock(d);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("highBlockN");
+                   CodeValidation.listExpresiones.add(Integer.toString(d));
                  }
                  //System.out.println("Se colocará un bloques lvl" + d + " en la posicion actual");
                :}
                 PUNTOCOMA
               | PUT LIGHT
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.putLight();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("putLight");
                  }
                  //System.out.println("Se colocará una luz azul en la posicion actual");
                :}
                 PUNTOCOMA
               | expresions PUT LIGHT
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.putLight();
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("putLight");
                  }
                  //System.out.println("Se colocará una luz azul en la posicion actual");
                :}
                 PUNTOCOMA
               | POS LPAREN ident:x COMA ident:y RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.pos(x,y);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("pos");
+                   CodeValidation.listExpresiones.add(x);
+                   CodeValidation.listExpresiones.add(y);
                  }
                  //System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
                :}
+               PUNTOCOMA
              | expresions POS LPAREN ident:x COMA ident:y RPAREN
               {:
-                if (CodeValidation.Corrida1 == false) {
+                if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                   CodeValidation.pos(x,y);
+                }
+                if (CodeValidation.ObteniendoExpr == true) {
+                  CodeValidation.listExpresiones.add("pos");
+                  CodeValidation.listExpresiones.add(x);
+                  CodeValidation.listExpresiones.add(y);
                 }
                 //System.out.println("Cambiando a celda posicion: (" + x + "," + y + ")");
               :}
                 PUNTOCOMA
               | POSSTART LPAREN ident:x COMA ident:y RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.posStart(x,y);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("posStart");
+                   CodeValidation.listExpresiones.add(x);
+                   CodeValidation.listExpresiones.add(y);
                  }
                  //System.out.println("Posicion inicial: (" + x + ","+ y + ")");
                :}
                 PUNTOCOMA
               | expresions POSSTART LPAREN ident:x COMA ident:y RPAREN
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.posStart(x,y);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("posStart");
+                   CodeValidation.listExpresiones.add(x);
+                   CodeValidation.listExpresiones.add(y);
                  }
                  //System.out.println("Posicion inicial: (" + x + ","+ y + ")");
                :}
                 PUNTOCOMA
               | CALL ident:proc
                {:
-                 if (CodeValidation.Corrida1 == false) {
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
                    CodeValidation.call(proc);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("call");
+                   CodeValidation.listExpresiones.add(proc);
                  }
                  //System.out.println("Llamando al procedimiento: " + i);
                :}
-             | expresions CALL ident:proc
-              {:
-                if (CodeValidation.Corrida1 == false) {
-                  CodeValidation.call(proc);
-                }
-                //System.out.println("Llamando al procedimiento: " + i);
-              :}
                 PUNTOCOMA
-              | KEEP expresions SKIP KEND
+              /*| expresions CALL ident:proc
                {:
-                System.out.println("Bucle Keep encontrado");
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.call(proc);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("call");
+                   CodeValidation.listExpresiones.add(proc);
+                 }
+                 //System.out.println("Llamando al procedimiento: " + i);
                :}
+                PUNTOCOMA*/
+              | KEEP
+              {:
+                if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                  CodeValidation.ObteniendoExpr = true;
+                  CodeValidation.NoEntrar = true;
+                }
+              :} expresions SKIP
+              {:
+                if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == true) {
+                  CodeValidation.ObteniendoExpr = false;
+                  CodeValidation.NoEntrar = false;
+                  //for (int n=0; n<d; n++) {   AQUI VA UN WHILE
+                    CodeValidation.ParserDeExpresiones(CodeValidation.listExpresiones);
+                  //}
+                  CodeValidation.listExpresiones.clear();
+                }
+                //System.out.println("Bucle Keep encontrado");
+              :}
+                KEND PUNTOCOMA
       /*       | KEEP expresions SKIP expresions KEND
               {:
                System.out.println("Bucle Keep encontrado");
               :}
                 PUNTOCOMA */
-              | FOR ID ASSIGN data:d TIMES expresions:exp {: System.out.println(exp); :}FEND
-               {://tira null el intento de sacar las expresions :c
-                System.out.println("Bucle For encontrado");
+
+
+              | FOR ID ASSIGN data:d TIMES
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.ObteniendoExpr = true;
+                   CodeValidation.NoEntrar = true;
+                 }
+               :} expresions FEND
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == true) {
+                   CodeValidation.ObteniendoExpr = false;
+                   CodeValidation.NoEntrar = false;
+                   for (int n=0; n<d; n++) {
+                     CodeValidation.ParserDeExpresiones(CodeValidation.listExpresiones);
+                   }
+                   CodeValidation.listExpresiones.clear();
+                 }
+                // System.out.println("Bucle For encontrado");
                :}
                 PUNTOCOMA
-              | expresions FOR ID ASSIGN data:d TIMES expresions:exp
-              {:
-                  if (CodeValidation.Corrida1 == false) {
-                    System.out.println(exp);} :} FEND
+              | expresions FOR ID ASSIGN data:d TIMES
                {:
-                  if (CodeValidation.Corrida1 == false) {
-                    System.out.println("Bucle For encontrado");}
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.ObteniendoExpr = true;
+                   CodeValidation.NoEntrar = true;
+                 }
+               :} expresions FEND
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == true) {
+                   CodeValidation.ObteniendoExpr = false;
+                   CodeValidation.NoEntrar = false;
+                   for (int n=0; n<d; n++) {
+                     CodeValidation.ParserDeExpresiones(CodeValidation.listExpresiones);
+                   }
+                   CodeValidation.listExpresiones.clear();
+                 }
+                // System.out.println("Bucle For encontrado");
                :}
                 PUNTOCOMA
-              | WHEN ID ASSIGN data:d THEN expresions WHEND
+              | WHEN ID ASSIGN data:d THEN
                {:
-                System.out.println("Bucle When encontrado");
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.ObteniendoExpr = true;
+                   CodeValidation.NoEntrar = true;
+                 }
+               :} expresions WHEND
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == true) {
+                   CodeValidation.ObteniendoExpr = false;
+                   CodeValidation.NoEntrar = false;
+                   Integer i = CodeValidation.search("Id",CodeValidation.listVariables);
+                   if (d.equals(CodeValidation.listValores.get(i))) {
+                     CodeValidation.ParserDeExpresiones(CodeValidation.listExpresiones);
+                   }
+                   CodeValidation.listExpresiones.clear();
+                 }
+                // System.out.println("Bucle When encontrado");
                :}
+                PUNTOCOMA
+              | expresions WHEN ID ASSIGN data:d THEN
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.ObteniendoExpr = true;
+                   CodeValidation.NoEntrar = true;
+                 }
+               :} expresions WHEND
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == true) {
+                   CodeValidation.ObteniendoExpr = false;
+                   CodeValidation.NoEntrar = false;
+                   Integer i = CodeValidation.search("Id",CodeValidation.listVariables);
+                   if (d.equals(CodeValidation.listValores.get(i))) {
+                     CodeValidation.ParserDeExpresiones(CodeValidation.listExpresiones);
+                   }
+                   CodeValidation.listExpresiones.clear();
+                 }
+                // System.out.println("Bucle When encontrado");
+               :}
+                PUNTOCOMA
+              | expresions CALL ident:proc
+               {:
+                 if (CodeValidation.Corrida1 == false & CodeValidation.NoEntrar == false) {
+                   CodeValidation.call(proc);
+                 }
+                 if (CodeValidation.ObteniendoExpr == true) {
+                   CodeValidation.listExpresiones.add("call");
+                   CodeValidation.listExpresiones.add(proc);
+                 }
+                 //System.out.println("Llamando al procedimiento: " + i);
+              :}
                 PUNTOCOMA
               ;
 
-process     ::= PROC ident:i expresions EndPROC
+process     ::= PROC ident:i
                {:
                  if (CodeValidation.Corrida1 == true) {
-			                CodeValidation.listProcesos.add(i);
-                 //      //CodeValidation.listEXPRESIONESdELpROCESO.add(expresions);
-		             }
+			             CodeValidation.listProcesos.add(i);
+                   CodeValidation.ObteniendoExpr = true;
+  		           } else {
+                   CodeValidation.NoEntrar = true;
+                 }
                 //System.out.println("Proceso creado");
                :}
-                PUNTOCOMA
-              | process PROC ident:i expresions EndPROC
+                expresions EndPROC
                {:
                  if (CodeValidation.Corrida1 == true) {
-			                CodeValidation.listProcesos.add(i);
-                      // CodeValidation.listEXPRESIONESdELpROCESO.add(expresions);
-		             }
-                //System.out.println("Siguiente proceso creado");
+                   CodeValidation.ObteniendoExpr = false;
+                   List<String> listaAUX = new ArrayList<String>(CodeValidation.listExpresiones);
+                   CodeValidation.listExpresiones.clear();
+                   CodeValidation.listExprProc.add(listaAUX);
+                 } else {
+                   CodeValidation.NoEntrar = false;
+                 }
+               :}
+                PUNTOCOMA
+              | process PROC ident:i
+               {:
+                 if (CodeValidation.Corrida1 == true) {
+			             CodeValidation.listProcesos.add(i);
+                   CodeValidation.ObteniendoExpr = true;
+                 } else {
+                   CodeValidation.NoEntrar = true;
+                 }
+                //System.out.println("Proceso creado");
+               :}
+                expresions EndPROC
+               {:
+                 if (CodeValidation.Corrida1 == true) {
+                   CodeValidation.ObteniendoExpr = false;
+                   List<String> listaAUX = new ArrayList<String>(CodeValidation.listExpresiones);
+                   CodeValidation.listExpresiones.clear();
+                   CodeValidation.listExprProc.add(listaAUX);
+                 } else {
+                   CodeValidation.NoEntrar = false;
+                 }
                :}
                 PUNTOCOMA
               ;

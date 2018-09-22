@@ -32,6 +32,7 @@ import org.reactfx.Subscription;
 
 import com.language.parser.AnalizerCreator;
 import com.language.parser.CodeValidation;
+import com.language.parser.Command;
 
 public class MainController {
 
@@ -48,11 +49,12 @@ public class MainController {
 	private static final String SEMICOLON_PATTERN = "\\;";
 	private static final String COMMENT_PATTERN = "//[^\n]*";
 	private static final String MAINWORD_PATTERN = "\\b(" + String.join("|", MAINWORDS) + ")\\b";
-
 	private static final Pattern PATTERN = Pattern.compile("(?<KEYWORD>" + KEYWORD_PATTERN + ")" + "|(?<MAINWORD>"
 			+ MAINWORD_PATTERN + ")" + "|(?<PAREN>" + PAREN_PATTERN + ")" + "|(?<BRACKET>" + BRACKET_PATTERN + ")"
 			+ "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")" + "|(?<COMMENT>" + COMMENT_PATTERN + ")");
-//----------------------------------------------------
+
+	private final String fileTemplate = "\n//Incluir aqui nombre y funcionalidad del codigo.\n\nBegin\n\nEnd\n\nProc name\n\n//Expressions\n\nEnd-Proc;";
+// ----------------------------------------------------
 
 //  Carga algunos elementos graficos fxml de fxml. 
 	private String localFile = "";
@@ -82,30 +84,70 @@ public class MainController {
 //************Atencion***************
 //	Aqui es la opcion del menu bar donde se hace el run para el codigo, donde se tiene que cambiar para eso. 
 	@FXML
-	private void RunCode(ActionEvent event) {
-		sendMessage("Iniciando :)"); // este es un metodo publico de este controller que puede imprimir en consola
-										// del IDE.
-		// Lo puede usar para errores y eso. O ver si funciona el parser y verificar que
-		// este haciendo algo.
+	private void RunCode(ActionEvent event) throws InterruptedException {
 
-//		saveSingleFile();		Metodo que guarde el codigo de la ventana e invoque a mi analizador 
-		//falta que agarre codigo del ide y lo ponga en el txt llamado code
-		
-		
+//		sendMessage("Iniciando :)"); 
 //		AnalizerCreator.createAnalyzers(); //creacion de analizadores
-		
-		System.out.println("no he entrado, la lista de variables es: " + CodeValidation.listVariables + " y la de valores es: " + CodeValidation.listValores);
-		AnalizerCreator.execute(); // ejecucion del compilador
-		System.out.println("luego de primera corrida, la lista de variables es: " + CodeValidation.listVariables + " y la de valores es: " + CodeValidation.listValores);
+
+		File tempFile = new File("code.txt");
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempFile), "utf-8"))) {
+			writer.write(codeArea.getText());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		CodeValidation.listVariables.add("Id");
+		CodeValidation.listValores.add(-1);
+		AnalizerCreator.execute(); // Primera ejecucion del compilador, para inicializacion de Variables y Procesos
 		CodeValidation.Corrida1 = false;
-		AnalizerCreator.execute();
-		System.out.println("luego de segunda corrida, la lista de variables es: " + CodeValidation.listVariables + " y la de valores es: " + CodeValidation.listValores);
+		AnalizerCreator.execute(); // Segunda corrida comprobacion de expresiones
 		if (CodeValidation.cantLuces == 0) {
-			System.err.println("Error : Don't exist lights");
+			System.err.println("Error : There are no existing lights"); // Error en caso de no existir luces
 			System.exit(1);
 		}
+
+		// LLAMADO A ENVIAR LISTA CON leds A ENCENDER //
+		for (Command cmd : CodeValidation.listaComandos) {
+			if (cmd.action.equals("clear")) {
+				if (cmd.id.equals("der")) {
+					CodeValidation.matrix.clearDirectionLed(2);
+				} else if (cmd.id.equals("izq")) {
+					CodeValidation.matrix.clearDirectionLed(1);
+				} else if (cmd.id.equals("arriba")) {
+					CodeValidation.matrix.clearDirectionLed(0);
+				} else if (cmd.id.equals("abajo")) {
+					CodeValidation.matrix.clearDirectionLed(3);
+				} else {
+					CodeValidation.matrix.clearLed(cmd.x, cmd.y, cmd.id);
+				}
+			} else if (cmd.action.equals("ON")) {
+				if (cmd.id.equals("der")) {
+					CodeValidation.matrix.setDirectionLed(2);
+				} else if (cmd.id.equals("izq")) {
+					CodeValidation.matrix.setDirectionLed(1);
+				} else if (cmd.id.equals("arriba")) {
+					CodeValidation.matrix.setDirectionLed(0);
+				} else if (cmd.id.equals("abajo")) {
+					CodeValidation.matrix.setDirectionLed(3);
+				} else {
+					CodeValidation.matrix.turnOnLed(cmd.x, cmd.y, cmd.id);
+				}
+			}
+		}
 		
-		//LLAMADO A ENVIAR LISTA CON leds A ENCENDER // 
+		if (CodeValidation.listPosicion.get(2) == 2); {
+			CodeValidation.matrix.clearDirectionLed(2);
+		}
+		if (CodeValidation.listPosicion.get(2) == 3); {
+			CodeValidation.matrix.clearDirectionLed(3);
+		}
+		if (CodeValidation.listPosicion.get(2) == 0); {
+			CodeValidation.matrix.clearDirectionLed(0);
+		}
+		if (CodeValidation.listPosicion.get(2) == 1); {
+			CodeValidation.matrix.clearDirectionLed(1);
+		}
+		CodeValidation.ModoJuego = true;
 	}
 
 //?????Importante pero no es necesario modificarlo o algo asi.
@@ -129,7 +171,7 @@ public class MainController {
 				// run the following code block when previous stream emits an event
 				.subscribe(ignore -> codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText())));
 		// when no longer need syntax highlighting and wish to clean up memory leaks
-		// run: `cleanupWhenNoLongerNeedIt.unsubscribe();`
+		codeArea.replaceText(fileTemplate);
 	}
 
 	private static StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -137,14 +179,13 @@ public class MainController {
 		int lastKwEnd = 0;
 		StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 		while (matcher.find()) {
-			String styleClass =
-                    matcher.group("KEYWORD") != null ? "keyword" :
-                    matcher.group("MAINWORD") != null ? "mainword" :
-                    matcher.group("PAREN") != null ? "paren" :
-                    matcher.group("BRACKET") != null ? "bracket" :
-                    matcher.group("SEMICOLON") != null ? "semicolon" :
-                    matcher.group("COMMENT") != null ? "comment" :
-                    null; /* never happens */ assert styleClass != null;
+			String styleClass = matcher.group("KEYWORD") != null ? "keyword"
+					: matcher.group("MAINWORD") != null ? "mainword"
+							: matcher.group("PAREN") != null ? "paren"
+									: matcher.group("BRACKET") != null ? "bracket"
+											: matcher.group("SEMICOLON") != null ? "semicolon"
+													: matcher.group("COMMENT") != null ? "comment" : null;
+			/* never happens */ assert styleClass != null;
 			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
 			spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
 			lastKwEnd = matcher.end();
@@ -181,45 +222,45 @@ public class MainController {
 	private void saveSingleFile() {
 		if (localFile.isEmpty()) {
 			FileChooser fileChooser = new FileChooser();
-		    ExtensionFilter filter = new ExtensionFilter("TXT files (*.txt)", "*.txt");
-		    fileChooser.setTitle("Save File");
-		    fileChooser.getExtensionFilters().add(filter);
-		    File selectedFile = fileChooser.showSaveDialog(null);
-		    if (selectedFile != null) {
-		    	
-		    	if (selectedFile.getAbsolutePath().endsWith(".txt")) {
-		    		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-				    		new FileOutputStream(selectedFile), "utf-8"))) {
-				    	writer.write(codeArea.getText());
-				    } catch (IOException e) {
-				    	e.printStackTrace();
-				    }
-				    localFile = selectedFile.getAbsolutePath();
-		    	} else {
-			    	File tempFile = new File(selectedFile.getAbsolutePath() + ".txt");
-				    try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-				    		new FileOutputStream(tempFile), "utf-8"))) {
-				    	writer.write(codeArea.getText());
-				    } catch (IOException e) {
-				    	e.printStackTrace();
-				    }
-				    localFile = tempFile.getAbsolutePath();
-		    	}
-		    }
+			ExtensionFilter filter = new ExtensionFilter("TXT files (*.txt)", "*.txt");
+			fileChooser.setTitle("Save File");
+			fileChooser.getExtensionFilters().add(filter);
+			File selectedFile = fileChooser.showSaveDialog(null);
+			if (selectedFile != null) {
+
+				if (selectedFile.getAbsolutePath().endsWith(".txt")) {
+					try (Writer writer = new BufferedWriter(
+							new OutputStreamWriter(new FileOutputStream(selectedFile), "utf-8"))) {
+						writer.write(codeArea.getText());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					localFile = selectedFile.getAbsolutePath();
+				} else {
+					File tempFile = new File(selectedFile.getAbsolutePath() + ".txt");
+					try (Writer writer = new BufferedWriter(
+							new OutputStreamWriter(new FileOutputStream(tempFile), "utf-8"))) {
+						writer.write(codeArea.getText());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					localFile = tempFile.getAbsolutePath();
+				}
+			}
 		} else {
 			File temp = new File(localFile);
-			 try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-			    		new FileOutputStream(temp), "utf-8"))) {
-			    	writer.write(codeArea.getText());
-		    } catch (IOException e) {
-		    	e.printStackTrace();
-		    }
+			try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), "utf-8"))) {
+				writer.write(codeArea.getText());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-	
+
 	private void closeFiles() {
 		localFile = "";
-		codeArea.clear();
+		codeArea.replaceText(fileTemplate);
+		;
 		console.clear();
 	}
 //??????????????????????????????????????????????????????????	

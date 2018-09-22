@@ -1,46 +1,32 @@
-/// LightBotCC -> Creacion de mapa ///
-		// --------------------- Identifiers ------------------
-Var asd;		// creacion de identificador
-Var dsa = 1;Var x = 6; Var y = 6;
 
-Begin		// --------------------- Begin: expressions -----------
-Set asd = 5;		// modificacion del valor de un identificador
-Set dsa = 5;
-Add+dsa;		// aumento en 1 valor al identificador
-Less-asd;		// reduccion en 1 valor al identificador
-Pos (x,y);		// movimiento a una posicion(x,y) en el tablero
-ChangeDir(BACK);	// cambio en la direccion de colocacion de elementos
-Place Block;		// agregado de un bloque siguiendo la direccion (por defecto con lvl1)
-Place Block 3;		// agregado de "n" bloques (por defecto con lvl1)
-High Block;		// agregado de bloque con altura lvl2
-High Block 3;		// agregado de bloque con altura "n"
-Put Light;		// agregado de una luz en la posicion
-PosStart (asd,dsa);	// asignacion de posicion inicial del bot
-	
-//Keep 
-//When Id = 2 Then
-//Pos(Id,Id);Put Light; // se debe poder usar Id como variable
-//ChangeDir(SAME);Place Block;
-//Set x=5;
-//Skip
-//Whend;
-//Kend;
+//Incluir aqui nombre y funcionalidad del codigo.
+Var x; Var y=0;Var asd=1; Var head=3;
+Begin
 
-For Id = 3 Times
-ChangeDir(LEFT);High Block;
-//For Id = 3 
-//ChangeDir(LEFT);High Block;
-//Fend;
+ChangeDir (LEFT);
+For Id=7 Times
+Pos(x,y);
 High Block;
+Place Block;
+Add+x;
 Fend;
 
-Call proc_1;		// invocacion del procedimiento llamado "proc_1"
-End		// --------------------- End -------------------------
+Pos(asd,asd);
+High Block 3;
+Place Block;
+Put Light;
+
+Pos(head,head);
+ChangeDir (BACK);
+Place Block 2;
+ChangeDir (RIGHT);
+Place Block 3;
+
+
+
+PosStart(head,head);
+End
 
 Proc proc_1	// --------------------- Proc: expressions -----------
-ChangeDir(LEFT);High Block;Put Light;
-End-Proc;	// --------------------- End-Proc --------------------
-
-Proc proc_2	// --------------------- Proc: expressions -----------
-ChangeDir(LEFT);High Block;Put Light;
+ChangeDir(LEFT);High Block;Place Block;Set y = 50;
 End-Proc;
